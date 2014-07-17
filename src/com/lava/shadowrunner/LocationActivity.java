@@ -1,5 +1,8 @@
 package com.lava.shadowrunner;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 import android.app.Activity;
@@ -10,11 +13,15 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class LocationActivity extends Activity implements LocationListener {
 	LocationManager mLocationManager;
 	Location mLocation;
 	TextView mTvLocation;
+	String value1;
+	private final static String STORETEXT="storetext.txt";
+	File file = new File(STORETEXT);
 	
 	
 
@@ -60,6 +67,8 @@ public class LocationActivity extends Activity implements LocationListener {
 	public void onLocationChanged(Location location) {
 		mLocation = location;
 		mTvLocation.setText(mLocation.getLatitude() + " ," + mLocation.getLongitude());
+		value1 = mTvLocation.getText().toString();
+		saveClicked();
 		
 	}
 
@@ -79,6 +88,25 @@ public class LocationActivity extends Activity implements LocationListener {
 	public void onProviderDisabled(String provider) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private void saveClicked() {
+	    try{
+	        OutputStreamWriter out=
+	                new OutputStreamWriter(openFileOutput(STORETEXT,  MODE_APPEND));
+	        out.write(value1);
+	        out.close();
+
+	        Toast
+	    .makeText(this, file.getAbsolutePath(), Toast.LENGTH_LONG)
+	    .show();
+
+	    }
+	    catch(Throwable t){
+	        Toast.makeText(this, "Exception: "+ t.toString(), Toast.LENGTH_LONG)
+	        .show();
+
+	    }
 	}
 	
 	

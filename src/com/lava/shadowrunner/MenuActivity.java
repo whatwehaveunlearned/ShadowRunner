@@ -1,5 +1,7 @@
 package com.lava.shadowrunner;
 
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -14,12 +16,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MenuActivity extends Activity implements OnInitListener {
 	private static final String TAG = "MenuActivity";
 	private TextToSpeech tts;
 	private boolean mAttachedToWindow;
 	private boolean mTTSSelected;
+	FileInputStream fis;
+	final StringBuffer storedString = new StringBuffer();
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +103,10 @@ public class MenuActivity extends Activity implements OnInitListener {
 			Intent intent = new Intent(this, LocationActivity.class);
 			startActivity(intent);
 			return true;
+			
+		case R.id.load:
+			load();
+			return true;
 
 		default:
 			return super.onOptionsItemSelected(item);
@@ -126,5 +136,27 @@ public class MenuActivity extends Activity implements OnInitListener {
 		} else {
 			Log.e("TTS", "Initilization Failed!");
 		}
-	}    
+	}
+	
+	public void load(){
+		FileInputStream fis;
+		final StringBuffer storedString = new StringBuffer();
+
+		try {
+		    fis = openFileInput("storetext.txt");
+		    DataInputStream dataIO = new DataInputStream(fis);
+		    String strLine = null;
+
+		    if ((strLine = dataIO.readLine()) != null) {
+		        storedString.append(strLine);
+		    }
+
+		    dataIO.close();
+		    fis.close();
+		    Toast.makeText(this, storedString, Toast.LENGTH_LONG)
+	        .show();
+		}
+		catch  (Exception e) {  
+		}
+		}	
 }

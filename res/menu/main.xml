@@ -19,4 +19,8 @@
      <item
         android:id="@+id/location"
         android:title="@string/location" />
+     
+     <item
+        android:id="@+id/load"
+        android:title="@string/load" />
 </menu>

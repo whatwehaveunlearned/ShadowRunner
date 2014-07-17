@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">Glassware!!!</string>
+    <string name="app_name">SHADOW RUNENR</string>
     <string name="say_glasswaretemplate">#Shadow Runner#</string>
     <string name="glass_voice_prompt">Say Glassware Template to trigger the glassware</string>
     <string name="stop">STOP</string>
     <string name="tts">TTS</string>
     <string name="asr">ASR</string>
     <string name="location">LOCATION</string>
-    <string name="footer">Beginning Google Glass Development: Chapter 2</string>
+    <string name="footer">SHADOW RUNNER</string>
+    <string name="load">LOAD</string>
     
 </resources>    
     
