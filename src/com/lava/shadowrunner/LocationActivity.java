@@ -67,7 +67,7 @@ public class LocationActivity extends Activity implements LocationListener {
 	public void onLocationChanged(Location location) {
 		mLocation = location;
 		mTvLocation.setText(mLocation.getLatitude() + " ," + mLocation.getLongitude());
-		value1 = mTvLocation.getText().toString();
+		value1 = "," + mTvLocation.getText().toString();
 		saveClicked();
 		
 	}
@@ -89,7 +89,7 @@ public class LocationActivity extends Activity implements LocationListener {
 		// TODO Auto-generated method stub
 		
 	}
-	
+	//Method to save the coordinates values on file
 	private void saveClicked() {
 	    try{
 	        OutputStreamWriter out=

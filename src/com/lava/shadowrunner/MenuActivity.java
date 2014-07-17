@@ -2,7 +2,9 @@ package com.lava.shadowrunner;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -25,6 +27,8 @@ public class MenuActivity extends Activity implements OnInitListener {
 	private boolean mTTSSelected;
 	FileInputStream fis;
 	final StringBuffer storedString = new StringBuffer();
+	float latit_float;
+	float long_float;
 	
 
 	@Override
@@ -105,7 +109,12 @@ public class MenuActivity extends Activity implements OnInitListener {
 			return true;
 			
 		case R.id.load:
-			load();
+			StringBuffer storage = load();
+			convert(storage);
+			return true;
+			
+		case R.id.calculate:
+			//convert(storage);
 			return true;
 
 		default:
@@ -138,7 +147,8 @@ public class MenuActivity extends Activity implements OnInitListener {
 		}
 	}
 	
-	public void load(){
+	//Method used to read the values from file
+	public StringBuffer load(){
 		FileInputStream fis;
 		final StringBuffer storedString = new StringBuffer();
 
@@ -155,8 +165,47 @@ public class MenuActivity extends Activity implements OnInitListener {
 		    fis.close();
 		    Toast.makeText(this, storedString, Toast.LENGTH_LONG)
 	        .show();
+		    return storedString;
 		}
 		catch  (Exception e) {  
+			return null;
 		}
-		}	
+		}
+	
+	//Method to convert values
+	public float convert (StringBuffer stringbuffer){
+		float f;
+		float [] latitudes;
+		float longitudes [];
+		List<String> coordinates = Arrays.asList(stringbuffer.toString().split(","));
+		latitudes = new float[(coordinates.size()/2)+1];
+		longitudes = new float[(coordinates.size()/2)+1];
+		System.out.println(coordinates);
+		System.out.println(coordinates.size()-2);
+		for (int i=1;i<coordinates.size()-2;i++){
+			
+			System.out.println(i);
+			System.out.println(coordinates.get(i).toString());
+			if( (i & 1) == 0 ){//even
+				latitudes[i] = Float.parseFloat(coordinates.get(i).toString());
+			}else{
+				longitudes[i] = Float.parseFloat(coordinates.get(i).toString());
+				//System.out.println(longitudes);
+			}
+		}
+		System.out.println(longitudes);
+		System.out.println(latitudes);
+		
+		return 0;
+		
+	}
+	
+	//Method to calculate output
+	public float calculate(float latitude,float longitude){
+		
+		float solution = latitude - longitude;
+		
+		return solution;
+		
+	}
 }

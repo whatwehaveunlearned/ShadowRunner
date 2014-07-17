@@ -10,6 +10,7 @@
     <string name="location">LOCATION</string>
     <string name="footer">SHADOW RUNNER</string>
     <string name="load">LOAD</string>
+    <string name="calculate">CALCULATE</string>
     
 </resources>    
     

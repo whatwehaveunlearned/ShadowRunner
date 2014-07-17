@@ -19,6 +19,7 @@ public final class R {
     }
     public static final class id {
         public static final int asr=0x7f080005;
+        public static final int calculate=0x7f080008;
         public static final int footer=0x7f080002;
         public static final int hello_view=0x7f080001;
         public static final int load=0x7f080007;
@@ -37,6 +38,7 @@ public final class R {
     public static final class string {
         public static final int app_name=0x7f050000;
         public static final int asr=0x7f050005;
+        public static final int calculate=0x7f050009;
         public static final int footer=0x7f050007;
         public static final int glass_voice_prompt=0x7f050002;
         public static final int load=0x7f050008;
