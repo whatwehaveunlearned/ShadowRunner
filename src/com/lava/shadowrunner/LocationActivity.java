@@ -20,7 +20,9 @@ public class LocationActivity extends Activity implements LocationListener {
 	Location mLocation;
 	TextView mTvLocation;
 	String value1;
-	private final static String STORETEXT="wifi_moore_test.txt";
+	//wifi_moore_test.txt text for GPS test confused with the name (walking)
+	//gps_moore_test.txt text for GPS test (running) to make comparisons
+	private final static String STORETEXT="gps_moore_test.txt";
 	File file = new File(STORETEXT);
 	
 	
@@ -37,13 +39,14 @@ public class LocationActivity extends Activity implements LocationListener {
 	protected void onStart() {
 		super.onStart();
 		Criteria criteria = new Criteria();
-		criteria.setAccuracy(Criteria.NO_REQUIREMENT);
-		//criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		//criteria.setAccuracy(Criteria.NO_REQUIREMENT);
+		criteria.setAccuracy(Criteria.ACCURACY_FINE);
 		//criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+		//System.out.println("best provider:" + mLocationManager.getBestProvider(criteria, true));
 		System.out.println("best provider:" + mLocationManager.getBestProvider(criteria, true));
 		String allString="";
 		
-		List<String> providers = mLocationManager.getProviders(criteria, false);
+		List<String> providers = mLocationManager.getProviders(criteria, true);
 		for (String p : providers) {
 			allString += p+":";
 			if (mLocationManager.isProviderEnabled(p)){
