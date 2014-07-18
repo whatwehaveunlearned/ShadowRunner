@@ -153,7 +153,7 @@ public class MenuActivity extends Activity implements OnInitListener {
 		final StringBuffer storedString = new StringBuffer();
 
 		try {
-		    fis = openFileInput("storetext.txt");
+		    fis = openFileInput("wifi_moore_test.txt");
 		    DataInputStream dataIO = new DataInputStream(fis);
 		    String strLine = null;
 
@@ -178,8 +178,8 @@ public class MenuActivity extends Activity implements OnInitListener {
 		float [] latitudes;
 		float longitudes [];
 		List<String> coordinates = Arrays.asList(stringbuffer.toString().split(","));
-		latitudes = new float[(coordinates.size()/2)+1];
-		longitudes = new float[(coordinates.size()/2)+1];
+		latitudes = new float[coordinates.size()];
+		longitudes = new float[coordinates.size()];
 		System.out.println(coordinates);
 		System.out.println(coordinates.size()-2);
 		for (int i=1;i<coordinates.size()-2;i++){

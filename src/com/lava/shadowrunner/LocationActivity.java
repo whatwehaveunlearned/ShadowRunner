@@ -20,7 +20,7 @@ public class LocationActivity extends Activity implements LocationListener {
 	Location mLocation;
 	TextView mTvLocation;
 	String value1;
-	private final static String STORETEXT="storetext.txt";
+	private final static String STORETEXT="wifi_moore_test.txt";
 	File file = new File(STORETEXT);
 	
 	
