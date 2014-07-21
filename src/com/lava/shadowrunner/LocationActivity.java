@@ -30,7 +30,14 @@ public class LocationActivity extends Activity implements LocationListener {
 	LocationManager mLocationManager;
 	Location mLocation;
 	TextView mTvLocation;
+<<<<<<< HEAD
 	private final static String STORETEXT="test.txt";
+=======
+	String value1;
+	//wifi_moore_test.txt text for GPS test confused with the name (walking)
+	//gps_moore_test.txt text for GPS test (running) to make comparisons
+	private final static String STORETEXT="gps_moore_test.txt";
+>>>>>>> FETCH_HEAD
 	File file = new File(STORETEXT);
 	private Path path = new Path();
 	//Initialize count to see when we calculate the distance in onLocationChanged
@@ -53,10 +60,11 @@ public class LocationActivity extends Activity implements LocationListener {
 		//criteria.setAccuracy(Criteria.NO_REQUIREMENT);
 		criteria.setAccuracy(Criteria.ACCURACY_FINE);
 		//criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+		//System.out.println("best provider:" + mLocationManager.getBestProvider(criteria, true));
 		System.out.println("best provider:" + mLocationManager.getBestProvider(criteria, true));
 		String allString="";
 		
-		List<String> providers = mLocationManager.getProviders(criteria, false);
+		List<String> providers = mLocationManager.getProviders(criteria, true);
 		for (String p : providers) {
 			allString += p+":";
 			if (mLocationManager.isProviderEnabled(p)){
