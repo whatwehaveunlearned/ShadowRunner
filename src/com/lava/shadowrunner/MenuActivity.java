@@ -30,6 +30,9 @@ public class MenuActivity extends Activity implements OnInitListener {
 	float latit_float;
 	float long_float;
 	
+	//To test Path class
+	private Path path = new Path();
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,10 @@ public class MenuActivity extends Activity implements OnInitListener {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		String file = "test.txt";
+		Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		Intent intent = new Intent(this, LocationActivity.class);
+		Bundle b;
 		switch (item.getItemId()) {
 		case R.id.stop:
 			stopService(new Intent(this, AppService.class));
@@ -99,22 +106,25 @@ public class MenuActivity extends Activity implements OnInitListener {
 			return true;
 
 		case R.id.asr:
-			Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-			startActivityForResult(i, 0);  
+			//startActivityForResult(i, 0);  
 			return true;
 		
 		case R.id.location:
-			Intent intent = new Intent(this, LocationActivity.class);
 			startActivity(intent);
 			return true;
 			
 		case R.id.load:
-			StringBuffer storage = load();
-			convert(storage);
+			StringBuffer storage = load(file);
+			System.out.println(storage);
+			Toast.makeText(this,"distance: " + storage, Toast.LENGTH_LONG)
+	        .show();
 			return true;
 			
 		case R.id.calculate:
-			//convert(storage);
+			b = intent.getExtras();
+			System.out.println(b);
+			System.out.println(intent.getExtras());
+			System.out.println(intent.getDoubleExtra("distance", 5.0));
 			return true;
 
 		default:
@@ -148,12 +158,12 @@ public class MenuActivity extends Activity implements OnInitListener {
 	}
 	
 	//Method used to read the values from file
-	public StringBuffer load(){
+	public StringBuffer load(String file){
 		FileInputStream fis;
 		final StringBuffer storedString = new StringBuffer();
 
 		try {
-		    fis = openFileInput("wifi_moore_test.txt");
+		    fis = openFileInput(file);
 		    DataInputStream dataIO = new DataInputStream(fis);
 		    String strLine = null;
 
@@ -190,22 +200,10 @@ public class MenuActivity extends Activity implements OnInitListener {
 				latitudes[i] = Float.parseFloat(coordinates.get(i).toString());
 			}else{
 				longitudes[i] = Float.parseFloat(coordinates.get(i).toString());
-				//System.out.println(longitudes);
 			}
 		}
-		System.out.println(longitudes);
-		System.out.println(latitudes);
 		
 		return 0;
-		
-	}
-	
-	//Method to calculate output
-	public float calculate(float latitude,float longitude){
-		
-		float solution = latitude - longitude;
-		
-		return solution;
 		
 	}
 }

@@ -38,12 +38,8 @@ public class AppService extends Service {
             // Keep track of the callback to remove it before unpublishing.
             mCallback = new AppDrawer(this);
             mLiveCard.setDirectRenderingEnabled(true).getSurfaceHolder().addCallback(mCallback);
+            addMenuToLiveCard();
             
-            Intent menuIntent = new Intent(this, MenuActivity.class);
-            mLiveCard.setAction(PendingIntent.getActivity(this, 0, menuIntent, 0));
-            
-            mLiveCard.publish(PublishMode.REVEAL);
-            Log.e(TAG, "Done publishing LiveCard");
         } 
         else {
         	Log.e(TAG, "onStartCommand: false");
@@ -68,5 +64,12 @@ public class AppService extends Service {
             Log.e(TAG, "OnDestroy: false");
         }
         super.onDestroy();
+    }
+    
+    public void addMenuToLiveCard(){
+    	Intent menuIntent = new Intent(this, MenuActivity.class);
+        mLiveCard.setAction(PendingIntent.getActivity(this, 0, menuIntent, 0)); 
+        mLiveCard.publish(PublishMode.REVEAL);
+        Log.e(TAG, "Done publishing LiveCard");
     }
 }
