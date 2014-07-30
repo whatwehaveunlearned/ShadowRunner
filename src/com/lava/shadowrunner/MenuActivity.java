@@ -27,11 +27,9 @@ public class MenuActivity extends Activity implements OnInitListener {
 	private boolean mTTSSelected;
 	FileInputStream fis;
 	final StringBuffer storedString = new StringBuffer();
-	float latit_float;
-	float long_float;
+	GPSTracker gps;
 	
-	//To test Path class
-	private Path path = new Path();
+	
 	
 
 	@Override
@@ -72,26 +70,29 @@ public class MenuActivity extends Activity implements OnInitListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		String file = "test.txt";
 		Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		//start GPSTracker class service
+		//gps = new GPSTracker(MenuActivity.this);
 		Intent intent = new Intent(this, LocationActivity.class);
-		Bundle b;
+		
 		switch (item.getItemId()) {
-		case R.id.stop:
-			stopService(new Intent(this, AppService.class));
-			return true;
+			case R.id.stop:
+				gps.stopUsingGPS();
+				stopService(new Intent(this, AppService.class));
+				return true;
 
-		case R.id.tts:
-			mTTSSelected = true;
-			tts = new TextToSpeech(this, this);  
-			tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-				@Override
-				public void onDone(String utteranceId) {
-					Log.w(TAG, "onDone");
-					if (tts != null) {
-						tts.stop();
-						tts.shutdown();
-					}                  
-					finish();
-				}
+			case R.id.tts:
+				mTTSSelected = true;
+				tts = new TextToSpeech(this, this);  
+				tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+					@Override
+					public void onDone(String utteranceId) {
+						Log.w(TAG, "onDone");
+						if (tts != null) {
+							tts.stop();
+							tts.shutdown();
+						}                  
+						finish();
+					}
 
 				@Override
 				public void onError(String utteranceId) {
@@ -105,30 +106,25 @@ public class MenuActivity extends Activity implements OnInitListener {
 			});
 			return true;
 
-		case R.id.asr:
-			//startActivityForResult(i, 0);  
-			return true;
+			case R.id.asr:
+				//startActivityForResult(i, 0);  
+				return true;
 		
-		case R.id.location:
-			startActivity(intent);
-			return true;
+			case R.id.location:
+				startActivity(intent);
+				return true;
 			
-		case R.id.load:
-			StringBuffer storage = load(file);
-			System.out.println(storage);
-			Toast.makeText(this,"distance: " + storage, Toast.LENGTH_LONG)
-	        .show();
-			return true;
+			case R.id.run:
+				return true;
 			
-		case R.id.calculate:
-			b = intent.getExtras();
-			System.out.println(b);
-			System.out.println(intent.getExtras());
-			System.out.println(intent.getDoubleExtra("distance", 5.0));
-			return true;
+			case R.id.calculate:
+				StringBuffer Distances = load(file);
+				double [] distance = convert(Distances);
+				System.out.println(distance);
+				return true;
 
-		default:
-			return super.onOptionsItemSelected(item);
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
@@ -163,11 +159,7 @@ public class MenuActivity extends Activity implements OnInitListener {
 		final StringBuffer storedString = new StringBuffer();
 
 		try {
-<<<<<<< HEAD
 		    fis = openFileInput(file);
-=======
-		    fis = openFileInput("gps_moore_test.txt");
->>>>>>> FETCH_HEAD
 		    DataInputStream dataIO = new DataInputStream(fis);
 		    String strLine = null;
 
@@ -187,27 +179,17 @@ public class MenuActivity extends Activity implements OnInitListener {
 		}
 	
 	//Method to convert values
-	public float convert (StringBuffer stringbuffer){
-		float f;
-		float [] latitudes;
-		float longitudes [];
-		List<String> coordinates = Arrays.asList(stringbuffer.toString().split(","));
-		latitudes = new float[coordinates.size()];
-		longitudes = new float[coordinates.size()];
-		System.out.println(coordinates);
-		System.out.println(coordinates.size());
-		for (int i=1;i<coordinates.size()-2;i++){
-			
-			System.out.println(i);
-			System.out.println(coordinates.get(i).toString());
-			if( (i & 1) == 0 ){//even
-				latitudes[i] = Float.parseFloat(coordinates.get(i).toString());
-			}else{
-				longitudes[i] = Float.parseFloat(coordinates.get(i).toString());
-			}
+	public double[] convert (StringBuffer stringbuffer){
+		double [] distance;
+		List<String> distanceArray = Arrays.asList(stringbuffer.toString().split(","));
+		distance = new double[distanceArray.size()];
+		System.out.println(distanceArray);
+		System.out.println(distanceArray.size());
+		for (int i=0;i<distanceArray.size();i++){
+				distance[i] = Double.parseDouble(distanceArray.get(i).toString());
 		}
 		
-		return 0;
+		return distance;
 		
 	}
 }

@@ -11,6 +11,8 @@ public class Path {
 	
 	//Create a list to hold the locations
 	List<Location> locationArray = new ArrayList<Location>();
+	//Create a list to hold the distances
+	List<Double> distanceArray = new ArrayList<Double>();
 	
 	//Constructor
 	public Path () {
@@ -24,19 +26,23 @@ public class Path {
 	//Method to calculate distance
 	public double distance(){
 		double distance = 0;
-		int j;
 		int  size = locationArray.size()-1;
 		System.out.println("SIZE: " + locationArray.size());
 		
 		System.out.println("PathDistance " + locationArray);
-		for(j=0;j<size;j++){
+		for(int j=0;j<size;j++){
 			distance = distance + locationArray.get(j).distanceTo(locationArray.get(j+1));
 			System.out.println("for " + j + " " + locationArray.get(j).distanceTo(locationArray.get(j+1)));
 		}
 		
 		System.out.println("PathDistance " + distance);
+		distanceArray.add(distance);
 		return distance;
 		
+	}
+	
+	public List<Double> readDistance(){
+		return distanceArray;
 	}
 	
 }

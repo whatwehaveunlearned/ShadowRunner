@@ -21,8 +21,8 @@
         android:title="@string/location" />
      
      <item
-        android:id="@+id/load"
-        android:title="@string/load" />
+        android:id="@+id/run"
+        android:title="@string/run" />
      
      <item
         android:id="@+id/calculate"

@@ -7,9 +7,9 @@
     <string name="stop">STOP</string>
     <string name="tts">TTS</string>
     <string name="asr">ASR</string>
-    <string name="location">LOCATION</string>
+    <string name="location">CREATE NEW RUN</string>
     <string name="footer">SHADOW RUNNER</string>
-    <string name="load">LOAD</string>
+    <string name="run">COMPETE</string>
     <string name="calculate">CALCULATE</string>
     
 </resources>    

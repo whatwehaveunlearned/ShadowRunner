@@ -30,14 +30,11 @@ public class LocationActivity extends Activity implements LocationListener {
 	LocationManager mLocationManager;
 	Location mLocation;
 	TextView mTvLocation;
-<<<<<<< HEAD
-	private final static String STORETEXT="test.txt";
-=======
-	String value1;
+
 	//wifi_moore_test.txt text for GPS test confused with the name (walking)
 	//gps_moore_test.txt text for GPS test (running) to make comparisons
-	private final static String STORETEXT="gps_moore_test.txt";
->>>>>>> FETCH_HEAD
+	private final static String STORETEXT="test.txt";
+
 	File file = new File(STORETEXT);
 	private Path path = new Path();
 	//Initialize count to see when we calculate the distance in onLocationChanged
@@ -57,8 +54,8 @@ public class LocationActivity extends Activity implements LocationListener {
 	protected void onStart() {
 		super.onStart();
 		Criteria criteria = new Criteria();
-		//criteria.setAccuracy(Criteria.NO_REQUIREMENT);
-		criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		criteria.setAccuracy(Criteria.NO_REQUIREMENT);
+		//criteria.setAccuracy(Criteria.ACCURACY_FINE);
 		//criteria.setAccuracy(Criteria.ACCURACY_COARSE);
 		//System.out.println("best provider:" + mLocationManager.getBestProvider(criteria, true));
 		System.out.println("best provider:" + mLocationManager.getBestProvider(criteria, true));
@@ -83,6 +80,10 @@ public class LocationActivity extends Activity implements LocationListener {
 			mTvLocation.setText(allString);
 		}
 	}
+	
+	
+	
+	
 /*	
 	@Override
 	public void onAttachedToWindow() {
@@ -129,6 +130,12 @@ public class LocationActivity extends Activity implements LocationListener {
 	}*/
 
 	@Override
+	protected void onDestroy() {
+		endGPS();
+		super.onDestroy();
+	}
+
+	@Override
 	public void onLocationChanged(Location location) {
 		double distance;
 		mLocation = location;
@@ -172,6 +179,21 @@ public class LocationActivity extends Activity implements LocationListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void endGPS()
+	{
+
+		try
+		{           
+			mLocationManager.removeUpdates(this);
+			mLocationManager=null;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	//Method to save the coordinates values on file
 	private void saveClicked(double value) {
 		String string;
@@ -179,7 +201,7 @@ public class LocationActivity extends Activity implements LocationListener {
 	        OutputStreamWriter out=
 	                new OutputStreamWriter(openFileOutput(STORETEXT,  MODE_APPEND));
 	        string = String.valueOf(value);
-	        out.write(string);
+	        out.write(string + ",");
 	        out.close();
 
 	    }
