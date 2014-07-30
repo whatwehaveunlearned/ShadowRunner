@@ -1,7 +1,11 @@
 package com.lava.shadowrunner;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +72,9 @@ public class MenuActivity extends Activity implements OnInitListener {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		
 		String file = "test.txt";
+		StringBuilder testrun;
 		Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 		//start GPSTracker class service
 		//gps = new GPSTracker(MenuActivity.this);
@@ -115,6 +121,8 @@ public class MenuActivity extends Activity implements OnInitListener {
 				return true;
 			
 			case R.id.run:
+				testrun = loadtest ();
+				System.out.println(testrun);
 				return true;
 			
 			case R.id.calculate:
@@ -190,6 +198,25 @@ public class MenuActivity extends Activity implements OnInitListener {
 		}
 		
 		return distance;
-		
+	}
+	
+	//Method to load test runs
+	public StringBuilder loadtest (){
+		InputStream ins = getResources().openRawResource(
+				getResources().getIdentifier("raw/test1",
+						"raw", getPackageName()));
+		BufferedReader r = new BufferedReader(new InputStreamReader(ins));
+		StringBuilder total = new StringBuilder();
+		String line;
+		try {
+			while ((line = r.readLine()) != null) {
+				total.append(line);
+	    
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return total;
 	}
 }
