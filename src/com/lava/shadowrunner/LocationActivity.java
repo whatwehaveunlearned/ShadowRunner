@@ -1,9 +1,14 @@
 package com.lava.shadowrunner;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,6 +45,10 @@ public class LocationActivity extends Activity implements LocationListener {
 	//Initialize count to see when we calculate the distance in onLocationChanged
 	int count = 0;
 	
+	//Load the test file for prototype
+	StringBuilder testrunstringbuilder;
+	String [] testrunstring;
+	List<Double> testrun = new ArrayList<Double>();
 	
 
 	@Override
@@ -48,6 +57,11 @@ public class LocationActivity extends Activity implements LocationListener {
 		setContentView(R.layout.location);
 		mTvLocation = (TextView) findViewById(R.id.tvLocation);
 		mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		testrunstringbuilder = loadtest ("test1");
+		System.out.println(testrunstringbuilder);
+		testrunstring = testrunstringbuilder.toString().split(",");
+		System.out.println(testrunstring[0]);
+		convert(testrunstring);
 	}
 
 	@Override
@@ -66,7 +80,7 @@ public class LocationActivity extends Activity implements LocationListener {
 			allString += p+":";
 			if (mLocationManager.isProviderEnabled(p)){
 				allString += "Y;";
-				mLocationManager.requestLocationUpdates(p,10000,0,this);
+				mLocationManager.requestLocationUpdates(p,500,0,this);
 				Location location = mLocationManager.getLastKnownLocation(p);
 				if(location==null)
 					System.out.println("getLastKnownLocation for provider " + p + " returns null");
@@ -137,22 +151,27 @@ public class LocationActivity extends Activity implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
+		
 		double distance;
+		double diference;
+		
 		mLocation = location;
 		mTvLocation.setText(mLocation.getLatitude() + " ," + mLocation.getLongitude());
-		System.out.println("onLocationChanged " + count);
-		if (count>1){
+		System.out.println("count value = " +count);
+		//Only one location has no distance!
+		if (count>=1){
 			path.addLocation(location);
-			if (count>3){
-				distance = path.distance();
-				System.out.println("onLocationChanged " + distance);
-				count = 0;
-				saveClicked(distance);
-				Toast.makeText(this,"distance: " + distance, Toast.LENGTH_LONG)
-				.show();
-			}
+			distance = path.distance();
+			System.out.println("onLocationChanged " + count);
+			saveClicked(distance);
+			//At this point we will load other run sessions previously set
+			diference = distance - testrun.get(count);
+			System.out.println(testrun);
+			System.out.println("onLocationChanged diference: " + diference);
+			Toast.makeText(this,"distance: " + diference, Toast.LENGTH_LONG)
+			.show();
 		}
-			count ++;
+		count ++;
 		
 		
 		//System.out.println("onLocationChanged " + path.distance());
@@ -212,30 +231,35 @@ public class LocationActivity extends Activity implements LocationListener {
 	    }
 	}
 	
-	//Method used to read the values from file
-		public StringBuffer load(String file){
-			FileInputStream fis;
-			final StringBuffer storedString = new StringBuffer();
-
+	//Method to load test runs resources already hard-coded
+		public StringBuilder loadtest (String filename){
+			
+			InputStream ins = getResources().openRawResource(
+					getResources().getIdentifier("raw/"+ filename,
+							"raw", getPackageName()));
+			BufferedReader r = new BufferedReader(new InputStreamReader(ins));
+			StringBuilder total = new StringBuilder();
+			String line;
+			
 			try {
-			    fis = openFileInput(file);
-			    DataInputStream dataIO = new DataInputStream(fis);
-			    String strLine = null;
-
-			    if ((strLine = dataIO.readLine()) != null) {
-			        storedString.append(strLine);
-			    }
-
-			    dataIO.close();
-			    fis.close();
-			    Toast.makeText(this, storedString, Toast.LENGTH_LONG)
-		        .show();
-			    return storedString;
+				while ((line = r.readLine()) != null) {
+					total.append(line);
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			catch  (Exception e) {  
-				return null;
+			return total;
+		}
+		
+		//Method to convert values from String to double
+		public void convert (String [] string){
+			
+			double [] distance = {0};
+			for (int i=0;i<string.length;i++){
+					testrun.add(Double.parseDouble(string[i]));
 			}
-			}
+		}
 	
 
 }

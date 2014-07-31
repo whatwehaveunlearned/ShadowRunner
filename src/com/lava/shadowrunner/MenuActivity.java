@@ -74,7 +74,8 @@ public class MenuActivity extends Activity implements OnInitListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		
 		String file = "test.txt";
-		StringBuilder testrun;
+		StringBuilder testrunstringbuilder;
+		String[] testrun;
 		Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 		//start GPSTracker class service
 		//gps = new GPSTracker(MenuActivity.this);
@@ -82,7 +83,6 @@ public class MenuActivity extends Activity implements OnInitListener {
 		
 		switch (item.getItemId()) {
 			case R.id.stop:
-				gps.stopUsingGPS();
 				stopService(new Intent(this, AppService.class));
 				return true;
 
@@ -121,7 +121,8 @@ public class MenuActivity extends Activity implements OnInitListener {
 				return true;
 			
 			case R.id.run:
-				testrun = loadtest ();
+				testrunstringbuilder = loadtest ();
+				testrun = testrunstringbuilder.toString().split(",");
 				System.out.println(testrun);
 				return true;
 			
