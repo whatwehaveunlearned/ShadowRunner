@@ -39,12 +39,14 @@ public class LocationActivity extends Activity implements LocationListener {
 	Location mLocation;
 	TextView mTvLocation;
 	DrawView mDrawView;
+	Bundle bundle;
+	String name;
 
 	//wifi_moore_test.txt text for GPS test confused with the name (walking)
 	//gps_moore_test.txt text for GPS test (running) to make comparisons
-	private final static String STORETEXT="test.txt";
+	private String STORETEXT;
 
-	File file = new File(STORETEXT);
+	File file;
 	private Path path = new Path();
 	//Initialize count to see when we calculate the distance in onLocationChanged
 	int count = 0;
@@ -69,6 +71,12 @@ public class LocationActivity extends Activity implements LocationListener {
 		mDrawView = new DrawView(this);
 		setContentView(mDrawView);
 		mDrawView.requestFocus();
+		//Retrieve the name of the run passed from MenuActivity
+		bundle = getIntent().getExtras();
+		STORETEXT = bundle.getString("path_name") + ".txt";
+		System.out.println(STORETEXT);
+		file = new File(STORETEXT);
+		
 	}
 
 	@Override

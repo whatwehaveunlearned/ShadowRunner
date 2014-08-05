@@ -25,12 +25,15 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 public class MenuActivity extends Activity implements OnInitListener {
+	private final int SPEECH_REQUEST = 0;
 	private static final String TAG = "MenuActivity";
 	private TextToSpeech tts;
 	private boolean mAttachedToWindow;
 	private boolean mTTSSelected;
+	private boolean shouldFinishOnMenuClose;
 	FileInputStream fis;
 	final StringBuffer storedString = new StringBuffer();
+	String path_name="default.txt";
 	
 	
 	
@@ -71,14 +74,13 @@ public class MenuActivity extends Activity implements OnInitListener {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		
+		shouldFinishOnMenuClose = true;
 		String file = "test.txt";
 		StringBuilder testrunstringbuilder;
 		String[] testrun;
 		Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 		//start GPSTracker class service
 		//gps = new GPSTracker(MenuActivity.this);
-		Intent intent = new Intent(this, LocationActivity.class);
 		
 		switch (item.getItemId()) {
 			case R.id.stop:
@@ -110,13 +112,11 @@ public class MenuActivity extends Activity implements OnInitListener {
 				}
 			});
 			return true;
-
-			case R.id.asr:
-				//startActivityForResult(i, 0);  
-				return true;
 		
 			case R.id.location:
-				startActivity(intent);
+				shouldFinishOnMenuClose = false;
+				startActivityForResult(i, SPEECH_REQUEST);
+				System.out.println(path_name);
 				return true;
 
 			default:
@@ -127,8 +127,11 @@ public class MenuActivity extends Activity implements OnInitListener {
 
 	@Override
 	public void onOptionsMenuClosed(Menu menu) {
-		if (!mTTSSelected) 
-			finish();
+		if (!mTTSSelected){
+			if (shouldFinishOnMenuClose) {
+		        finish();
+		    }
+		}
 	}
 
 
@@ -206,5 +209,28 @@ public class MenuActivity extends Activity implements OnInitListener {
 			e.printStackTrace();
 		}
 		return total;
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) 
+	{
+		Intent intent = new Intent(this, LocationActivity.class);
+		Bundle bundle;
+		if (requestCode == SPEECH_REQUEST) {
+	        if (resultCode == RESULT_OK) {
+	            // process the speech
+	    		System.out.println("In loop");
+	    		List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+	            path_name = results.get(0);
+	            //to pass information to the locationActivity
+	            bundle = new Bundle();
+	            bundle.putString("path_name", path_name);
+	            intent.putExtras(bundle);
+	            //After processing the name of the run we launch the activity with that name 
+		        startActivity(intent);
+	        }
+	        //Important to close the menu because I use the flag in order not to do it before processing the speech
+	        finish();
+	    }
 	}
 }
