@@ -14,9 +14,9 @@ public class Path {
 	//Create a list to hold the distances
 	List<Double> distanceArray = new ArrayList<Double>();
 	
-	//Constructor
+	//Empty Constructor
 	public Path () {
-	} ; 
+	} 
 	
 	//Method to add a location
 	public void addLocation(Location location){

@@ -1,3 +1,4 @@
+//Inflates layout
 package com.lava.shadowrunner;
 
 import android.content.Context;

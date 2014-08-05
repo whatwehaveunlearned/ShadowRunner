@@ -36,6 +36,7 @@ public class AppService extends Service {
             mLiveCard = new LiveCard(this, LIVE_CARD_ID);
 
             // Keep track of the callback to remove it before unpublishing.
+            //Here we mix the drawing(AppDrawer) with the Live card (mLiveCard)
             mCallback = new AppDrawer(this);
             mLiveCard.setDirectRenderingEnabled(true).getSurfaceHolder().addCallback(mCallback);
             addMenuToLiveCard();

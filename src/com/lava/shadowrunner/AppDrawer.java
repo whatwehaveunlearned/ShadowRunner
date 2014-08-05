@@ -1,3 +1,4 @@
+//Draws the layout
 package com.lava.shadowrunner;
 
 import android.content.Context;
@@ -41,7 +42,7 @@ public class AppDrawer implements SurfaceHolder.Callback {
     	Log.e(TAG, "surfaceDestroyed");
         mHolder = null;
     }
-
+//Draws the SurfaceHolder's canvas
     private void draw(View view) {
     	Log.e(TAG, "draw");
         Canvas canvas;

@@ -31,7 +31,6 @@ public class MenuActivity extends Activity implements OnInitListener {
 	private boolean mTTSSelected;
 	FileInputStream fis;
 	final StringBuffer storedString = new StringBuffer();
-	GPSTracker gps;
 	
 	
 	
@@ -118,18 +117,6 @@ public class MenuActivity extends Activity implements OnInitListener {
 		
 			case R.id.location:
 				startActivity(intent);
-				return true;
-			
-			case R.id.run:
-				testrunstringbuilder = loadtest ();
-				testrun = testrunstringbuilder.toString().split(",");
-				System.out.println(testrun);
-				return true;
-			
-			case R.id.calculate:
-				StringBuffer Distances = load(file);
-				double [] distance = convert(Distances);
-				System.out.println(distance);
 				return true;
 
 			default:

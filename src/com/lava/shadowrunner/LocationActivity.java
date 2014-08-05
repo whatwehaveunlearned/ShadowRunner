@@ -12,9 +12,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.lava.shadowrunner.DrawView.Square;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -35,6 +38,7 @@ public class LocationActivity extends Activity implements LocationListener {
 	LocationManager mLocationManager;
 	Location mLocation;
 	TextView mTvLocation;
+	DrawView mDrawView;
 
 	//wifi_moore_test.txt text for GPS test confused with the name (walking)
 	//gps_moore_test.txt text for GPS test (running) to make comparisons
@@ -62,6 +66,9 @@ public class LocationActivity extends Activity implements LocationListener {
 		testrunstring = testrunstringbuilder.toString().split(",");
 		System.out.println(testrunstring[0]);
 		convert(testrunstring);
+		mDrawView = new DrawView(this);
+		setContentView(mDrawView);
+		mDrawView.requestFocus();
 	}
 
 	@Override
@@ -80,7 +87,7 @@ public class LocationActivity extends Activity implements LocationListener {
 			allString += p+":";
 			if (mLocationManager.isProviderEnabled(p)){
 				allString += "Y;";
-				mLocationManager.requestLocationUpdates(p,500,0,this);
+				mLocationManager.requestLocationUpdates(p,100*60,0,this);
 				Location location = mLocationManager.getLastKnownLocation(p);
 				if(location==null)
 					System.out.println("getLastKnownLocation for provider " + p + " returns null");
@@ -95,53 +102,6 @@ public class LocationActivity extends Activity implements LocationListener {
 		}
 	}
 	
-	
-	
-	
-/*	
-	@Override
-	public void onAttachedToWindow() {
-		super.onAttachedToWindow();
-		mAttachedToWindow = true;
-		openOptionsMenu();
-	}
-
-	@Override
-	public void onDetachedFromWindow() {
-		super.onDetachedFromWindow();
-		mAttachedToWindow = false;
-	}	
-
-	@Override
-	public void openOptionsMenu() {
-		if (mAttachedToWindow) {
-			super.openOptionsMenu();
-		}
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.main, menu);
-		super.onCreateOptionsMenu(menu);
-
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-		Intent intent = new Intent(this, LocationActivity.class);
-		Bundle b;
-		switch (item.getItemId()) {
-		case R.id.stop:
-			stopService(new Intent(this, AppService.class));
-			return true;
-
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}*/
 
 	@Override
 	protected void onDestroy() {
@@ -153,7 +113,7 @@ public class LocationActivity extends Activity implements LocationListener {
 	public void onLocationChanged(Location location) {
 		
 		double distance;
-		double diference;
+		Double diference;
 		
 		mLocation = location;
 		mTvLocation.setText(mLocation.getLatitude() + " ," + mLocation.getLongitude());
@@ -169,9 +129,18 @@ public class LocationActivity extends Activity implements LocationListener {
 			System.out.println(testrun);
 			System.out.println("onLocationChanged diference: " + diference);
 			Toast.makeText(this,"distance: " + diference, Toast.LENGTH_LONG)
-			.show();
+					.show();
+					if (diference>0){
+						mTvLocation.setText("You are winning by: " + diference.intValue() + " m.");
+					}else{
+		mTvLocation.setText("You are losing by:" + -diference.intValue() + " m.");
+			}
 		}
 		count ++;
+		draw();
+		
+		
+		
 		
 		
 		//System.out.println("onLocationChanged " + path.distance());
@@ -254,11 +223,23 @@ public class LocationActivity extends Activity implements LocationListener {
 		
 		//Method to convert values from String to double
 		public void convert (String [] string){
-			
-			double [] distance = {0};
 			for (int i=0;i<string.length;i++){
 					testrun.add(Double.parseDouble(string[i]));
 			}
+		}
+		
+		public void draw(){
+			Square square = mDrawView.new Square();
+			square.top = 10;
+			square.left = 400;
+			square.right = 630;
+			square.bottom = 300;
+			Paint paint = new Paint();
+			paint.setARGB(255,255,255,255);
+			paint.setAntiAlias(true);
+			mDrawView.points.add(square);
+			mDrawView.paints.add(paint);
+			mDrawView.invalidate();
 		}
 	
 
