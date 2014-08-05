@@ -10,7 +10,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import com.lava.shadowrunner.DrawView.Square;
 
@@ -32,6 +34,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
+import android.speech.tts.UtteranceProgressListener;
 
 public class LocationActivity extends Activity implements LocationListener {
 	private boolean mAttachedToWindow;
@@ -41,6 +46,7 @@ public class LocationActivity extends Activity implements LocationListener {
 	DrawView mDrawView;
 	Bundle bundle;
 	String name;
+	private TextToSpeech tts;
 
 	//wifi_moore_test.txt text for GPS test confused with the name (walking)
 	//gps_moore_test.txt text for GPS test (running) to make comparisons
@@ -145,8 +151,37 @@ public class LocationActivity extends Activity implements LocationListener {
 			}
 		}
 		count ++;
+		//Paint the image of the runner in screen
 		draw();
-		
+		//audio clues
+//		tts = new TextToSpeech(this, (OnInitListener) this);  
+//		tts = new TextToSpeech(this, (OnInitListener) this);
+//		int result = tts.setLanguage(Locale.US);
+//		if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+//			Log.e("TTS", "This Language is not supported");
+//		} else {
+//			HashMap<String, String> map = new HashMap<String, String>();
+//			map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"helloID");				
+//			tts.speak("Hello Glass!", TextToSpeech.QUEUE_FLUSH, map);
+//			}
+//		tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+//			@Override
+//			public void onDone(String utteranceId) {
+//				if (tts != null) {
+//					tts.stop();
+//					tts.shutdown();
+//				}                  
+//				finish();
+//			}
+//
+//			@Override
+//			public void onError(String utteranceId) {
+//			}
+//
+//			@Override
+//			public void onStart(String utteranceId) {
+//			}
+//		});
 		
 		
 		
@@ -249,6 +284,23 @@ public class LocationActivity extends Activity implements LocationListener {
 			mDrawView.paints.add(paint);
 			mDrawView.invalidate();
 		}
+		
+//		@Override
+//		public void onInit(int status) {
+//			if (status == TextToSpeech.SUCCESS) {
+//				int result = tts.setLanguage(Locale.US);
+//
+//				if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+//					Log.e("TTS", "This Language is not supported");
+//				} else {
+//					HashMap<String, String> map = new HashMap<String, String>();
+//					map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"helloID");				
+//					tts.speak("Hello Glass!", TextToSpeech.QUEUE_FLUSH, map);
+//				}
+//			} else {
+//				Log.e("TTS", "Initilization Failed!");
+//			}
+//		}
 	
 
 }

@@ -75,12 +75,7 @@ public class MenuActivity extends Activity implements OnInitListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		shouldFinishOnMenuClose = true;
-		String file = "test.txt";
-		StringBuilder testrunstringbuilder;
-		String[] testrun;
 		Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-		//start GPSTracker class service
-		//gps = new GPSTracker(MenuActivity.this);
 		
 		switch (item.getItemId()) {
 			case R.id.stop:
