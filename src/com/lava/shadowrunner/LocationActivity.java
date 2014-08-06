@@ -133,7 +133,9 @@ public class LocationActivity extends Activity implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		int userpos, competitorpos;
+		int userpos = 50;
+		int competitorpos=50;
+		int fileposvalue=0;
 		Double distance = 0.0;
 		Double diference= 0.0;
 		String output = "Wating for data";
@@ -142,18 +144,20 @@ public class LocationActivity extends Activity implements LocationListener {
 		mTvLocation.setText(mLocation.getLatitude() + " ," + mLocation.getLongitude());
 		System.out.println("count value = " +count);
 		path.addLocation(location);
+		System.out.println("path :" + path.distanceArray);
 		//We race until either we finish or the competitor finishes 
-		if(count<testrunstring.length-1){
-			//Only one location has no distance!
-			if (count>=1){
+		if(fileposvalue<=testrunstring.length-1){
+			//Only one location has no distance! We wait a while to begin for more accuracy
+			if (count>=2){
 				distance = path.distance();
-				System.out.println("onLocationChanged count" + count);
+				System.out.println("onLocationChanged fileposvalue" + (fileposvalue));
 				saveClicked(distance);
 				//At this point we will load other run sessions previously set
-				diference = distance - testrun.get(count);
-				System.out.println("onLocationChanged diference: " + diference);
+				diference = distance - testrun.get(fileposvalue);
+				System.out.println("real :" + testrun.get(fileposvalue));
+				//System.out.println("onLocationChanged diference: " + diference);
 				//Decide who is in front
-				if (diference>0){
+				if (diference > 0){
 //					Toast.makeText(this, "You are winning by: " + diference.intValue() + " m.", Toast.LENGTH_LONG)
 //					.show();
 					output = "You are winning by: " + diference.intValue() + " m.";
@@ -162,11 +166,14 @@ public class LocationActivity extends Activity implements LocationListener {
 //					.show();
 					output = "You are losing by:" + -diference.intValue() + " m.";
 				}
+				//Paint the image of the runner in screen
+				userpos = mapCoordinate(distance.intValue(),totaldistance);
+				competitorpos = mapCoordinate(testrun.get(count).intValue(),totaldistance);
+				draw(userpos,competitorpos,output);
+				fileposvalue ++;
 			}
 			count ++;
-			//Paint the image of the runner in screen
-			userpos = mapCoordinate(distance.intValue(),totaldistance);
-			competitorpos = mapCoordinate(testrun.get(count).intValue(),totaldistance);
+			//We initialize at the start point
 			draw(userpos,competitorpos,output);
 		}else{
 			//RACE ENDED!!
@@ -248,6 +255,7 @@ public class LocationActivity extends Activity implements LocationListener {
 			for (int i=0;i<string.length;i++){
 					testrun.add(Double.parseDouble(string[i]));
 			}
+			System.out.println("allValues: " + testrun);
 		}
 		//****************** END Methods used for loading from file *********************
 		
@@ -265,16 +273,18 @@ public class LocationActivity extends Activity implements LocationListener {
 			
 			//paint line and image moving across the line
 			mDrawView.userpoint = point1;
+			System.out.println("point1: " + point1);
+			System.out.println("point2: " + point2);
 			mDrawView.competitorpoint = point2;
 			mDrawView.output = text;
 			mDrawView.invalidate();
 		}
 		
 		public int mapCoordinate(int point, int length){
+			int converted;
 			//Scale f(x)=[((b-a)*(x-min))/(max-min)]+a a:50 b:560 min:0 max:560
-			point = (600*point)/length;
-			point = ((560-50)*point/560)+50;
-			return point;
+			converted = ((560-50)*point/560)+50;
+			return converted;
 		}
 
 }

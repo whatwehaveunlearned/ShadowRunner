@@ -62,6 +62,8 @@ public class DrawView extends View{
 		canvas.drawLine(50, 200, 560, 200, paint);
 		//the variable is going to be the x value one will be the actual runner the other who are you running against
 		canvas.drawCircle(userpoint,200,10,userpaint);
+		System.out.println("userpoint " + userpoint);
+		System.out.println("competitorpoint " + competitorpoint);
 		canvas.drawCircle(competitorpoint,200,10,competitorpaint);
 		canvas.drawText(start, 10, 180, paint);
 		canvas.drawText(goal, 530, 180, paint);

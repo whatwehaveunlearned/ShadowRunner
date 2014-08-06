@@ -177,8 +177,6 @@ public class MenuActivity extends Activity implements OnInitListener {
 		double [] distance;
 		List<String> distanceArray = Arrays.asList(stringbuffer.toString().split(","));
 		distance = new double[distanceArray.size()];
-		System.out.println(distanceArray);
-		System.out.println(distanceArray.size());
 		for (int i=0;i<distanceArray.size();i++){
 				distance[i] = Double.parseDouble(distanceArray.get(i).toString());
 		}
@@ -214,7 +212,6 @@ public class MenuActivity extends Activity implements OnInitListener {
 		if (requestCode == SPEECH_REQUEST) {
 	        if (resultCode == RESULT_OK) {
 	            // process the speech
-	    		System.out.println("In loop");
 	    		List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 	            path_name = results.get(0);
 	            //to pass information to the locationActivity
