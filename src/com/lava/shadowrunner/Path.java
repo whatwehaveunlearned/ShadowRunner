@@ -40,7 +40,7 @@ public class Path {
 		return distance;
 		
 	}
-	
+	//Method that retrieves the distanceArray for a path
 	public List<Double> readDistance(){
 		return distanceArray;
 	}

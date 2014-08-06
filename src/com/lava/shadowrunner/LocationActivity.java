@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -55,7 +56,8 @@ public class LocationActivity extends Activity implements LocationListener {
 	File file;
 	private Path path = new Path();
 	//Initialize count to see when we calculate the distance in onLocationChanged
-	int count = 0;
+	int count;
+	int totaldistance;
 	
 	//Load the test file for prototype
 	StringBuilder testrunstringbuilder;
@@ -66,22 +68,28 @@ public class LocationActivity extends Activity implements LocationListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		count = 0;
+		totaldistance = 0;
 		setContentView(R.layout.location);
 		mTvLocation = (TextView) findViewById(R.id.tvLocation);
 		mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		testrunstringbuilder = loadtest ("test1");
-		System.out.println(testrunstringbuilder);
 		testrunstring = testrunstringbuilder.toString().split(",");
-		System.out.println(testrunstring[0]);
 		convert(testrunstring);
-		mDrawView = new DrawView(this);
-		setContentView(mDrawView);
-		mDrawView.requestFocus();
+		//Calculate total distance for the competitor run for drawing based in a scale
+		for(int i=0;i<testrunstring.length-1;i++){
+			totaldistance+=testrun.get(i);
+		}
+		System.out.println("TOTALDISTANCE: " + totaldistance);
 		//Retrieve the name of the run passed from MenuActivity
 		bundle = getIntent().getExtras();
 		STORETEXT = bundle.getString("path_name") + ".txt";
-		System.out.println(STORETEXT);
 		file = new File(STORETEXT);
+		//For painting using canvas
+		mDrawView = new DrawView(this);
+		setContentView(mDrawView);
+		mDrawView.requestFocus();
+		
 		
 	}
 
@@ -125,72 +133,44 @@ public class LocationActivity extends Activity implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		
-		double distance;
-		Double diference;
+		int userpos, competitorpos;
+		Double distance = 0.0;
+		Double diference= 0.0;
+		String output = "Wating for data";
 		
 		mLocation = location;
 		mTvLocation.setText(mLocation.getLatitude() + " ," + mLocation.getLongitude());
 		System.out.println("count value = " +count);
-		//Only one location has no distance!
-		if (count>=1){
-			path.addLocation(location);
-			distance = path.distance();
-			System.out.println("onLocationChanged " + count);
-			saveClicked(distance);
-			//At this point we will load other run sessions previously set
-			diference = distance - testrun.get(count);
-			System.out.println(testrun);
-			System.out.println("onLocationChanged diference: " + diference);
-			Toast.makeText(this,"distance: " + diference, Toast.LENGTH_LONG)
-					.show();
-					if (diference>0){
-						mTvLocation.setText("You are winning by: " + diference.intValue() + " m.");
-					}else{
-		mTvLocation.setText("You are losing by:" + -diference.intValue() + " m.");
+		path.addLocation(location);
+		//We race until either we finish or the competitor finishes 
+		if(count<testrunstring.length-1){
+			//Only one location has no distance!
+			if (count>=1){
+				distance = path.distance();
+				System.out.println("onLocationChanged count" + count);
+				saveClicked(distance);
+				//At this point we will load other run sessions previously set
+				diference = distance - testrun.get(count);
+				System.out.println("onLocationChanged diference: " + diference);
+				//Decide who is in front
+				if (diference>0){
+//					Toast.makeText(this, "You are winning by: " + diference.intValue() + " m.", Toast.LENGTH_LONG)
+//					.show();
+					output = "You are winning by: " + diference.intValue() + " m.";
+				}else{
+//					Toast.makeText(this, "You are losing by:" + -diference.intValue() + " m.", Toast.LENGTH_LONG)
+//					.show();
+					output = "You are losing by:" + -diference.intValue() + " m.";
+				}
 			}
+			count ++;
+			//Paint the image of the runner in screen
+			userpos = mapCoordinate(distance.intValue(),totaldistance);
+			competitorpos = mapCoordinate(testrun.get(count).intValue(),totaldistance);
+			draw(userpos,competitorpos,output);
+		}else{
+			//RACE ENDED!!
 		}
-		count ++;
-		//Paint the image of the runner in screen
-		draw();
-		//audio clues
-//		tts = new TextToSpeech(this, (OnInitListener) this);  
-//		tts = new TextToSpeech(this, (OnInitListener) this);
-//		int result = tts.setLanguage(Locale.US);
-//		if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-//			Log.e("TTS", "This Language is not supported");
-//		} else {
-//			HashMap<String, String> map = new HashMap<String, String>();
-//			map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"helloID");				
-//			tts.speak("Hello Glass!", TextToSpeech.QUEUE_FLUSH, map);
-//			}
-//		tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-//			@Override
-//			public void onDone(String utteranceId) {
-//				if (tts != null) {
-//					tts.stop();
-//					tts.shutdown();
-//				}                  
-//				finish();
-//			}
-//
-//			@Override
-//			public void onError(String utteranceId) {
-//			}
-//
-//			@Override
-//			public void onStart(String utteranceId) {
-//			}
-//		});
-		
-		
-		
-		
-		//System.out.println("onLocationChanged " + path.distance());
-		//getIntent().putExtra("distance", path.distance());
-		//i.putExtra("distance", path.distance());
-		//System.out.println("onLocationChanged " + getIntent().getBundleExtra("distance"));
-		//System.out.println("onLocationChanged " + b);
 	}
 
 	@Override
@@ -242,17 +222,16 @@ public class LocationActivity extends Activity implements LocationListener {
 
 	    }
 	}
+	//****************** Methods used for loading from file *********************
 	
 	//Method to load test runs resources already hard-coded
 		public StringBuilder loadtest (String filename){
-			
 			InputStream ins = getResources().openRawResource(
 					getResources().getIdentifier("raw/"+ filename,
 							"raw", getPackageName()));
 			BufferedReader r = new BufferedReader(new InputStreamReader(ins));
 			StringBuilder total = new StringBuilder();
 			String line;
-			
 			try {
 				while ((line = r.readLine()) != null) {
 					total.append(line);
@@ -270,37 +249,32 @@ public class LocationActivity extends Activity implements LocationListener {
 					testrun.add(Double.parseDouble(string[i]));
 			}
 		}
+		//****************** END Methods used for loading from file *********************
 		
-		public void draw(){
-			Square square = mDrawView.new Square();
+		//****************** Methods used for drawing in the canvas *********************
+		public void draw(int point1, int point2, String text){
+		/*  Paint square in top left of the screen to use with the images of hoaliku*/	
+		/*	Square square = mDrawView.new Square();
 			square.top = 10;
 			square.left = 400;
 			square.right = 630;
 			square.bottom = 300;
-			Paint paint = new Paint();
-			paint.setARGB(255,255,255,255);
-			paint.setAntiAlias(true);
 			mDrawView.points.add(square);
 			mDrawView.paints.add(paint);
+			mDrawView.invalidate();  */
+			
+			//paint line and image moving across the line
+			mDrawView.userpoint = point1;
+			mDrawView.competitorpoint = point2;
+			mDrawView.output = text;
 			mDrawView.invalidate();
 		}
 		
-//		@Override
-//		public void onInit(int status) {
-//			if (status == TextToSpeech.SUCCESS) {
-//				int result = tts.setLanguage(Locale.US);
-//
-//				if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-//					Log.e("TTS", "This Language is not supported");
-//				} else {
-//					HashMap<String, String> map = new HashMap<String, String>();
-//					map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,"helloID");				
-//					tts.speak("Hello Glass!", TextToSpeech.QUEUE_FLUSH, map);
-//				}
-//			} else {
-//				Log.e("TTS", "Initilization Failed!");
-//			}
-//		}
-	
+		public int mapCoordinate(int point, int length){
+			//Scale f(x)=[((b-a)*(x-min))/(max-min)]+a a:50 b:560 min:0 max:560
+			point = (600*point)/length;
+			point = ((560-50)*point/560)+50;
+			return point;
+		}
 
 }
