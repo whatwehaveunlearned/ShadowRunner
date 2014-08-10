@@ -58,6 +58,9 @@ public class LocationActivity extends Activity implements LocationListener {
 	//Initialize count to see when we calculate the distance in onLocationChanged
 	int count;
 	int totaldistance;
+	//Hold the values for the user and the competitor actual distance
+	Double userdistance;
+	Double competdistance;
 	
 	//Load the test file for prototype
 	StringBuilder testrunstringbuilder;
@@ -70,6 +73,8 @@ public class LocationActivity extends Activity implements LocationListener {
 		super.onCreate(savedInstanceState);
 		count = 0;
 		totaldistance = 0;
+		userdistance = 0.0;
+		competdistance = 0.0;
 		setContentView(R.layout.location);
 		mTvLocation = (TextView) findViewById(R.id.tvLocation);
 		mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -77,9 +82,7 @@ public class LocationActivity extends Activity implements LocationListener {
 		testrunstring = testrunstringbuilder.toString().split(",");
 		convert(testrunstring);
 		//Calculate total distance for the competitor run for drawing based in a scale
-		for(int i=0;i<testrunstring.length-1;i++){
-			totaldistance+=testrun.get(i);
-		}
+		totaldistance+=testrun.get(testrunstring.length-1);
 		System.out.println("TOTALDISTANCE: " + totaldistance);
 		//Retrieve the name of the run passed from MenuActivity
 		bundle = getIntent().getExtras();
@@ -109,7 +112,7 @@ public class LocationActivity extends Activity implements LocationListener {
 			allString += p+":";
 			if (mLocationManager.isProviderEnabled(p)){
 				allString += "Y;";
-				mLocationManager.requestLocationUpdates(p,100*60,0,this);
+				mLocationManager.requestLocationUpdates(p,100*60,0,this); //100*60
 				Location location = mLocationManager.getLastKnownLocation(p);
 				if(location==null)
 					System.out.println("getLastKnownLocation for provider " + p + " returns null");
@@ -133,51 +136,49 @@ public class LocationActivity extends Activity implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		int userpos = 50;
+		//Our zero in the line is 50
+		int userpos=50;
 		int competitorpos=50;
-		int fileposvalue=0;
-		Double distance = 0.0;
+		boolean exit=false;
 		Double diference= 0.0;
-		String output = "Wating for data";
-		
+		String output = "Waiting for data";
 		mLocation = location;
+		
 		mTvLocation.setText(mLocation.getLatitude() + " ," + mLocation.getLongitude());
 		System.out.println("count value = " +count);
 		path.addLocation(location);
-		System.out.println("path :" + path.distanceArray);
-		//We race until either we finish or the competitor finishes 
-		if(fileposvalue<=testrunstring.length-1){
-			//Only one location has no distance! We wait a while to begin for more accuracy
-			if (count>=2){
-				distance = path.distance();
-				System.out.println("onLocationChanged fileposvalue" + (fileposvalue));
-				saveClicked(distance);
-				//At this point we will load other run sessions previously set
-				diference = distance - testrun.get(fileposvalue);
-				System.out.println("real :" + testrun.get(fileposvalue));
-				//System.out.println("onLocationChanged diference: " + diference);
-				//Decide who is in front
-				if (diference > 0){
-//					Toast.makeText(this, "You are winning by: " + diference.intValue() + " m.", Toast.LENGTH_LONG)
-//					.show();
-					output = "You are winning by: " + diference.intValue() + " m.";
-				}else{
-//					Toast.makeText(this, "You are losing by:" + -diference.intValue() + " m.", Toast.LENGTH_LONG)
-//					.show();
-					output = "You are losing by:" + -diference.intValue() + " m.";
-				}
-				//Paint the image of the runner in screen
-				userpos = mapCoordinate(distance.intValue(),totaldistance);
-				competitorpos = mapCoordinate(testrun.get(count).intValue(),totaldistance);
-				draw(userpos,competitorpos,output);
-				fileposvalue ++;
-			}
-			count ++;
-			//We initialize at the start point
-			draw(userpos,competitorpos,output);
-		}else{
-			//RACE ENDED!!
+		//We set to be -1 when the race is ended
+		if(exit == true){
+			endGPS();
+			finish();
 		}
+		//Only one location has no distance! so we wait to calculate when we have at least 2
+		if (count>=1){
+			userdistance = path.distance();
+			competdistance = testrun.get(count-1);
+			saveClicked(userdistance);
+			//At this point we will load other run sessions previously set
+			diference = userdistance - competdistance;
+			//Decide who is in front
+			if (diference > 0){
+				output = "You are winning by: " + diference.intValue() + " m.";
+			}else{
+				output = "You are losing by:" + -diference.intValue() + " m.";
+			}
+			//Paint the image of the runner in screen
+			userpos = mapCoordinate(userdistance.intValue(),totaldistance);
+			competitorpos = mapCoordinate(competdistance.intValue(),totaldistance);
+			if (competdistance == totaldistance){
+				output = "SORRY YOU LOST...";
+				count=-1;
+				exit=true;
+			}else if (path.distance() == totaldistance){
+				output = "CONGRATS YOU WON! ";
+				exit=true;
+			}
+		}
+		draw(userpos,competitorpos,output);
+		count ++;
 	}
 
 	@Override
@@ -282,8 +283,8 @@ public class LocationActivity extends Activity implements LocationListener {
 		
 		public int mapCoordinate(int point, int length){
 			int converted;
-			//Scale f(x)=[((b-a)*(x-min))/(max-min)]+a a:50 b:560 min:0 max:560
-			converted = ((560-50)*point/560)+50;
+			//Scale f(x)=[((b-a)*(x-min))/(max-min)]+a a:50 b:560 min:0 max:length
+			converted = ((560-50)*point/length)+50;
 			return converted;
 		}
 

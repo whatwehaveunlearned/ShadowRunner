@@ -23,14 +23,13 @@ public class Path {
 		locationArray.add(location);
 	}
 	
-	//Method to calculate distance
+	//Method to calculate distance of all the past Locations
 	public double distance(){
 		double distance = 0;
 		int  size = locationArray.size()-1;
 
 		for(int j=0;j<size;j++){
 			distance = distance + locationArray.get(j).distanceTo(locationArray.get(j+1));
-			System.out.println("for " + j + " " + locationArray.get(j).distanceTo(locationArray.get(j+1)));
 		}
 		distanceArray.add(distance);
 		return distance;
