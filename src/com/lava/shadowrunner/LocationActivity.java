@@ -1,53 +1,31 @@
 package com.lava.shadowrunner;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-
-import com.lava.shadowrunner.DrawView.Square;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Paint;
-import android.graphics.Point;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.speech.RecognizerIntent;
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.TextToSpeech.OnInitListener;
-import android.speech.tts.UtteranceProgressListener;
 
 public class LocationActivity extends Activity implements LocationListener {
-	private boolean mAttachedToWindow;
 	LocationManager mLocationManager;
 	Location mLocation;
 	TextView mTvLocation;
 	DrawView mDrawView;
 	Bundle bundle;
 	String name;
-	private TextToSpeech tts;
 
 	//wifi_moore_test.txt text for GPS test confused with the name (walking)
 	//gps_moore_test.txt text for GPS test (running) to make comparisons
@@ -141,7 +119,7 @@ public class LocationActivity extends Activity implements LocationListener {
 		int competitorpos=50;
 		boolean exit=false;
 		Double diference= 0.0;
-		String output = "Waiting for data";
+		String output = "";
 		mLocation = location;
 		
 		mTvLocation.setText(mLocation.getLatitude() + " ," + mLocation.getLongitude());
@@ -161,9 +139,9 @@ public class LocationActivity extends Activity implements LocationListener {
 			diference = userdistance - competdistance;
 			//Decide who is in front
 			if (diference > 0){
-				output = "You are winning by: " + diference.intValue() + " m.";
+				output = diference.intValue() + " m.";
 			}else{
-				output = "You are losing by:" + -diference.intValue() + " m.";
+				output = diference.intValue() + " m.";
 			}
 			//Paint the image of the runner in screen
 			userpos = mapCoordinate(userdistance.intValue(),totaldistance);
@@ -261,17 +239,7 @@ public class LocationActivity extends Activity implements LocationListener {
 		//****************** END Methods used for loading from file *********************
 		
 		//****************** Methods used for drawing in the canvas *********************
-		public void draw(int point1, int point2, String text){
-		/*  Paint square in top left of the screen to use with the images of hoaliku*/	
-		/*	Square square = mDrawView.new Square();
-			square.top = 10;
-			square.left = 400;
-			square.right = 630;
-			square.bottom = 300;
-			mDrawView.points.add(square);
-			mDrawView.paints.add(paint);
-			mDrawView.invalidate();  */
-			
+		public void draw(int point1, int point2, String text){			
 			//paint line and image moving across the line
 			mDrawView.userpoint = point1;
 			System.out.println("point1: " + point1);
