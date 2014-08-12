@@ -76,6 +76,7 @@ public class MenuActivity extends Activity implements OnInitListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		shouldFinishOnMenuClose = true;
 		Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		Intent intent = new Intent(this, LocationActivity.class);
 		
 		switch (item.getItemId()) {
 			case R.id.stop:
@@ -109,9 +110,10 @@ public class MenuActivity extends Activity implements OnInitListener {
 			return true;
 		
 			case R.id.location:
-				shouldFinishOnMenuClose = false;
-				startActivityForResult(i, SPEECH_REQUEST);
-				System.out.println(path_name);
+				//shouldFinishOnMenuClose = false;
+				//startActivityForResult(i, SPEECH_REQUEST);
+				//System.out.println(path_name);
+				startActivity(intent);
 				return true;
 
 			default:

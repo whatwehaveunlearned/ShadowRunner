@@ -29,7 +29,7 @@ public class LocationActivity extends Activity implements LocationListener {
 
 	//wifi_moore_test.txt text for GPS test confused with the name (walking)
 	//gps_moore_test.txt text for GPS test (running) to make comparisons
-	private String STORETEXT;
+	private String STORETEXT="test.txt";
 
 	File file;
 	private Path path = new Path();
@@ -64,7 +64,7 @@ public class LocationActivity extends Activity implements LocationListener {
 		System.out.println("TOTALDISTANCE: " + totaldistance);
 		//Retrieve the name of the run passed from MenuActivity
 		bundle = getIntent().getExtras();
-		STORETEXT = bundle.getString("path_name") + ".txt";
+		//STORETEXT = bundle.getString("path_name") + ".txt";
 		file = new File(STORETEXT);
 		//For painting using canvas
 		mDrawView = new DrawView(this);
@@ -133,6 +133,8 @@ public class LocationActivity extends Activity implements LocationListener {
 		//Only one location has no distance! so we wait to calculate when we have at least 2
 		if (count>=1){
 			userdistance = path.distance();
+			path.MediaSpeed();
+			path.MediaAcc();
 			competdistance = testrun.get(count-1);
 			saveClicked(userdistance);
 			//At this point we will load other run sessions previously set
