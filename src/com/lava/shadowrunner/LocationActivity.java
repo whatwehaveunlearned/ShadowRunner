@@ -177,9 +177,9 @@ public class LocationActivity extends Activity implements LocationListener {
 		
 	}
 	
+	//Method to stop the GPS
 	public void endGPS()
 	{
-
 		try
 		{           
 			mLocationManager.removeUpdates(this);
@@ -191,24 +191,25 @@ public class LocationActivity extends Activity implements LocationListener {
 		}
 	}
 	
+	//****************** Methods used for saving & loading from file *************************
+	
 	//Method to save the coordinates values on file
 	private void saveClicked(double value) {
 		String string;
+		
 	    try{
 	        OutputStreamWriter out=
 	                new OutputStreamWriter(openFileOutput(STORETEXT,  MODE_APPEND));
 	        string = String.valueOf(value);
 	        out.write(string + ",");
 	        out.close();
-
 	    }
 	    catch(Throwable t){
 	        Toast.makeText(this, "Exception: "+ t.toString(), Toast.LENGTH_LONG)
 	        .show();
-
 	    }
 	}
-	//****************** Methods used for loading from file *********************
+	
 	
 	//Method to load test runs resources already hard-coded
 		public StringBuilder loadtest (String filename){
@@ -218,6 +219,7 @@ public class LocationActivity extends Activity implements LocationListener {
 			BufferedReader r = new BufferedReader(new InputStreamReader(ins));
 			StringBuilder total = new StringBuilder();
 			String line;
+			
 			try {
 				while ((line = r.readLine()) != null) {
 					total.append(line);
@@ -236,9 +238,11 @@ public class LocationActivity extends Activity implements LocationListener {
 			}
 			System.out.println("allValues: " + testrun);
 		}
-		//****************** END Methods used for loading from file *********************
+		
+		//****************** END Methods used for saving & loading from file *********************
 		
 		//****************** Methods used for drawing in the canvas *********************
+		
 		public void draw(int point1, int point2, String text){			
 			//paint line and image moving across the line
 			mDrawView.userpoint = point1;
@@ -249,11 +253,13 @@ public class LocationActivity extends Activity implements LocationListener {
 			mDrawView.invalidate();
 		}
 		
+		//Method to scale values of the positions to the actual drawing
 		public int mapCoordinate(int point, int length){
 			int converted;
 			//Scale f(x)=[((b-a)*(x-min))/(max-min)]+a a:50 b:560 min:0 max:length
 			converted = ((560-50)*point/length)+50;
 			return converted;
 		}
-
+		
+		//****************** END Methods used for drawing in the canvas *********************
 }
