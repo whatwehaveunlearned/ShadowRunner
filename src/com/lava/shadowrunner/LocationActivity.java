@@ -43,7 +43,8 @@ public class LocationActivity extends Activity implements LocationListener {
 	//Load the test file for prototype
 	StringBuilder testrunstringbuilder;
 	String [] testrunstring;
-	List<Double> testrun = new ArrayList<Double>();
+	List<Double> testdistance = new ArrayList<Double>();
+	List<Double> testspeed = new ArrayList<Double>();
 	
 
 	@Override
@@ -56,11 +57,15 @@ public class LocationActivity extends Activity implements LocationListener {
 		setContentView(R.layout.location);
 		mTvLocation = (TextView) findViewById(R.id.tvLocation);
 		mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-		testrunstringbuilder = loadtest ("test1");
+		//Load the test file get the distances and speeds
+		testrunstringbuilder = loadtest ("distance1");
 		testrunstring = testrunstringbuilder.toString().split(",");
-		convert(testrunstring);
+		convert(testrunstring, testdistance);
+		testrunstringbuilder = loadtest ("speed1");
+		testrunstring = testrunstringbuilder.toString().split(",");
+		convert(testrunstring, testspeed);
 		//Calculate total distance for the competitor run for drawing based in a scale
-		totaldistance+=testrun.get(testrunstring.length-1);
+		totaldistance+=testdistance.get(testrunstring.length-1);
 		System.out.println("TOTALDISTANCE: " + totaldistance);
 		//Retrieve the name of the run passed from MenuActivity
 		bundle = getIntent().getExtras();
@@ -121,6 +126,7 @@ public class LocationActivity extends Activity implements LocationListener {
 		Double diference= 0.0;
 		String output = "";
 		mLocation = location;
+		double competspeed=0.0;
 		
 		mTvLocation.setText(mLocation.getLatitude() + " ," + mLocation.getLongitude());
 		System.out.println("count value = " +count);
@@ -134,8 +140,8 @@ public class LocationActivity extends Activity implements LocationListener {
 		if (count>=1){
 			userdistance = path.distance();
 			path.MediaSpeed();
-			path.MediaAcc();
-			competdistance = testrun.get(count-1);
+			competdistance = testdistance.get(count-1);
+			competspeed = testspeed.get(count-1);
 			saveClicked(userdistance);
 			//At this point we will load other run sessions previously set
 			diference = userdistance - competdistance;
@@ -157,7 +163,7 @@ public class LocationActivity extends Activity implements LocationListener {
 				exit=true;
 			}
 		}
-		draw(userpos,competitorpos,output);
+		draw(userpos,competitorpos,output,competspeed);
 		count ++;
 	}
 
@@ -234,24 +240,23 @@ public class LocationActivity extends Activity implements LocationListener {
 		}
 		
 		//Method to convert values from String to double
-		public void convert (String [] string){
+		public void convert (String [] string, List<Double> list){
 			for (int i=0;i<string.length;i++){
-					testrun.add(Double.parseDouble(string[i]));
+				list.add(Double.parseDouble(string[i]));
 			}
-			System.out.println("allValues: " + testrun);
+			System.out.println("allValues: " + list);
 		}
 		
 		//****************** END Methods used for saving & loading from file *********************
 		
 		//****************** Methods used for drawing in the canvas *********************
 		
-		public void draw(int point1, int point2, String text){			
+		public void draw(int point1, int point2, String text, double speed){			
 			//paint line and image moving across the line
 			mDrawView.userpoint = point1;
-			System.out.println("point1: " + point1);
-			System.out.println("point2: " + point2);
 			mDrawView.competitorpoint = point2;
 			mDrawView.output = text;
+			mDrawView.competitorspeed = speed;
 			mDrawView.invalidate();
 		}
 		

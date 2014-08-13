@@ -22,11 +22,17 @@ public class DrawView extends View{
 	//Initial Points
 	int userpoint=50;
 	int competitorpoint=50;
-	//Rectangles to hold the runner images and images
+	//Initial Speeds
+	double userspeed = 0.0;
+	double competitorspeed = 0.0;
+	//Rectangles to hold the runner images and the different images drawn
 	RectF user;
 	RectF competitor;
+	RectF speed;
 	Bitmap userimage = BitmapFactory.decodeResource(getResources(), R.drawable.green);
 	Bitmap competitorimage = BitmapFactory.decodeResource(getResources(), R.drawable.orange);
+	Bitmap flagimage = BitmapFactory.decodeResource(getResources(), R.drawable.flag);
+	Bitmap speedimage = BitmapFactory.decodeResource(getResources(), R.drawable.speed);
 	//Initial position of the rectangles
 	int userleft = 50;
 	int usertop = 90;
@@ -66,9 +72,23 @@ public class DrawView extends View{
 		//Move the user alog the road
 		user.offsetTo(userpoint, usertop);
 		competitor.offsetTo(competitorpoint, competitortop);
-		//And the images to the user and comptitor rectangles
-		canvas.drawBitmap(userimage, null, user, rectpaint);
-		canvas.drawBitmap(competitorimage, null, competitor, rectpaint);
+		//And the images to the user and competitor rectangles
+		System.out.println("compSpeed: " + competitorspeed);
+		System.out.println("userSpeed: " + userspeed);
+		if (competitorspeed>1){
+			speed = new RectF(competitor);
+			speed.offsetTo(competitorpoint-10, competitortop);
+			canvas.drawBitmap(competitorimage, null, speed, rectpaint);
+			canvas.drawBitmap(speedimage, null, speed, rectpaint);
+		}else if(userspeed>1){
+			speed = new RectF(user);
+			speed.offsetTo(userpoint-10, usertop);
+			canvas.drawBitmap(competitorimage, null, competitor, rectpaint);
+			canvas.drawBitmap(speedimage, null, speed, rectpaint);
+		}else{
+			canvas.drawBitmap(userimage, null, user, rectpaint);
+			canvas.drawBitmap(competitorimage, null, competitor, rectpaint);
+		}
 		//Adding information text
 		//canvas.drawText(start, 10, 180, paint);
 		//canvas.drawText(goal, 530, 180, paint);

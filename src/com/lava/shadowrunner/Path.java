@@ -20,7 +20,7 @@ public class Path {
 	//Create a list to hold Accelerations
 	List<Double> accelerationArray = new ArrayList<Double>();
 	//Is Speeding variables
-	boolean IsSpeeding=false;
+	boolean isSpeeding=false;
 	
 	//Empty Constructor
 	public Path () {
@@ -62,6 +62,13 @@ public class Path {
 		}
 		speed=speed/size;
 		speedArray.add(speed);
+		//When we have more than one speed we can check if we are speeding
+		if (speedArray.size()>1){
+			if(speedArray.get(speedArray.size()-1)>speedArray.get(speedArray.size()-2)){
+				isSpeeding = true;
+				System.out.println("isSpeeding: "+ isSpeeding);
+			}
+		}
 		System.out.println("SpeedArray: "+ speedArray);
 		return speed;
 		
@@ -97,6 +104,7 @@ public class Path {
 		speed = location1.distanceTo(location2) / (time);
 		System.out.println("Speed: "+ speed);
 		timeArray.add(time);
+		System.out.println("TimeArray: "+ timeArray);
 		return speed;
 	}
 	
