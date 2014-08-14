@@ -20,7 +20,7 @@ public final class R {
         public static final int ic_tts=0x7f020006;
         public static final int orange=0x7f020007;
         public static final int runner=0x7f020008;
-        public static final int speed=0x7f020009;
+        public static final int speedeffect=0x7f020009;
     }
     public static final class id {
         public static final int footer=0x7f090002;

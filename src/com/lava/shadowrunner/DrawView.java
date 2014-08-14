@@ -32,7 +32,7 @@ public class DrawView extends View{
 	Bitmap userimage = BitmapFactory.decodeResource(getResources(), R.drawable.green);
 	Bitmap competitorimage = BitmapFactory.decodeResource(getResources(), R.drawable.orange);
 	Bitmap flagimage = BitmapFactory.decodeResource(getResources(), R.drawable.flag);
-	Bitmap speedimage = BitmapFactory.decodeResource(getResources(), R.drawable.speed);
+	Bitmap speedimage = BitmapFactory.decodeResource(getResources(), R.drawable.speedeffect);
 	//Initial position of the rectangles
 	int userleft = 50;
 	int usertop = 90;
@@ -61,13 +61,14 @@ public class DrawView extends View{
 		text.setColor(Color.RED);
 		rectpaint.setAntiAlias(true);
 		//Create the actual rectangles with the positions defined initially
-		user = new RectF(userleft,usertop,userright,userbottom);
-		competitor = new RectF(competitorleft,competitortop,competitorright,competitorbottom);	
+		competitor = new RectF(userleft,usertop,userright,userbottom);
+		user = new RectF(competitorleft,competitortop,competitorright,competitorbottom);
+		speed = new RectF(competitorleft,competitortop+20,competitorright,competitorbottom-20);
 	}
 	
 	public void onDraw(Canvas canvas){
 		//Create the lines representing road
-		canvas.drawLine(50,170,560,170, lines);
+		canvas.drawLine(50,130,560,130, lines);
 		canvas.drawLine(50,230,560,230,lines);
 		//Move the user alog the road
 		user.offsetTo(userpoint, usertop);
@@ -76,19 +77,14 @@ public class DrawView extends View{
 		System.out.println("compSpeed: " + competitorspeed);
 		System.out.println("userSpeed: " + userspeed);
 		if (competitorspeed>1){
-			speed = new RectF(competitor);
-			speed.offsetTo(competitorpoint-10, competitortop);
-			canvas.drawBitmap(competitorimage, null, speed, rectpaint);
+			speed.offsetTo(competitorpoint-50, competitortop+20);
 			canvas.drawBitmap(speedimage, null, speed, rectpaint);
 		}else if(userspeed>1){
-			speed = new RectF(user);
-			speed.offsetTo(userpoint-10, usertop);
-			canvas.drawBitmap(competitorimage, null, competitor, rectpaint);
+			speed.offsetTo(userpoint-50, usertop+20);
 			canvas.drawBitmap(speedimage, null, speed, rectpaint);
-		}else{
-			canvas.drawBitmap(userimage, null, user, rectpaint);
-			canvas.drawBitmap(competitorimage, null, competitor, rectpaint);
 		}
+		canvas.drawBitmap(userimage, null, user, rectpaint);
+		canvas.drawBitmap(competitorimage, null, competitor, rectpaint);
 		//Adding information text
 		//canvas.drawText(start, 10, 180, paint);
 		//canvas.drawText(goal, 530, 180, paint);
