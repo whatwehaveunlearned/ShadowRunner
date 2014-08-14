@@ -147,9 +147,9 @@ public class LocationActivity extends Activity implements LocationListener {
 			diference = userdistance - competdistance;
 			//Decide who is in front
 			if (diference > 0){
-				output = diference.intValue() + " m.";
+				output = diference.intValue() + " m";
 			}else{
-				output = diference.intValue() + " m.";
+				output = diference.intValue() + " m";
 			}
 			//Paint the image of the runner in screen
 			userpos = mapCoordinate(userdistance.intValue(),totaldistance);
