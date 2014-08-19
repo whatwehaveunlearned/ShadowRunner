@@ -32,7 +32,7 @@ public class MenuActivity extends Activity implements OnInitListener {
 	private boolean mTTSSelected;
 	private boolean shouldFinishOnMenuClose;
 	FileInputStream fis;
-	final StringBuffer storedString = new StringBuffer();
+	StringBuffer storedString = new StringBuffer();
 	String path_name="default.txt";
 	
 	
@@ -114,6 +114,8 @@ public class MenuActivity extends Activity implements OnInitListener {
 				//startActivityForResult(i, SPEECH_REQUEST);
 				//System.out.println(path_name);
 				startActivity(intent);
+				//storedString=load("default.txt");
+				//System.out.println("FILE: " +storedString);
 				return true;
 
 			default:

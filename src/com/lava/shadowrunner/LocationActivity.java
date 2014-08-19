@@ -11,6 +11,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -29,7 +30,7 @@ public class LocationActivity extends Activity implements LocationListener {
 
 	//wifi_moore_test.txt text for GPS test confused with the name (walking)
 	//gps_moore_test.txt text for GPS test (running) to make comparisons
-	private String STORETEXT="test.txt";
+	private String STORETEXT="default.txt";
 
 	File file;
 	private Path path = new Path();
@@ -39,6 +40,8 @@ public class LocationActivity extends Activity implements LocationListener {
 	//Hold the values for the user and the competitor actual distance
 	Double userdistance;
 	Double competdistance;
+	//Set to true when the race is finished
+	boolean exit=false;
 	
 	//Load the test file for prototype
 	StringBuilder testrunstringbuilder;
@@ -122,7 +125,6 @@ public class LocationActivity extends Activity implements LocationListener {
 		//Our zero in the line is 50
 		int userpos=50;
 		int competitorpos=50;
-		boolean exit=false;
 		Double diference= 0.0;
 		String output = "";
 		mLocation = location;
@@ -147,19 +149,24 @@ public class LocationActivity extends Activity implements LocationListener {
 			diference = userdistance - competdistance;
 			//Decide who is in front
 			if (diference > 0){
-				output = diference.intValue() + " m";
+				mDrawView.text.setColor(Color.GREEN);
 			}else{
-				output = diference.intValue() + " m";
+				mDrawView.text.setColor(Color.RED);
 			}
+			output = diference.intValue() + " m";
 			//Paint the image of the runner in screen
 			userpos = mapCoordinate(userdistance.intValue(),totaldistance);
 			competitorpos = mapCoordinate(competdistance.intValue(),totaldistance);
-			if (competdistance == totaldistance){
-				output = "SORRY YOU LOST...";
+			if (competdistance >= totaldistance){
+				output = "YOU LOST...";
 				count=-1;
+				mDrawView.text.setColor(Color.RED);
+				mDrawView.text.setTextSize(50);
 				exit=true;
-			}else if (path.distance() == totaldistance){
-				output = "CONGRATS YOU WON! ";
+			}else if (userdistance >= totaldistance){
+				output = "YOU WON! ";
+				mDrawView.text.setColor(Color.GREEN);
+				mDrawView.text.setTextSize(50);
 				exit=true;
 			}
 		}
