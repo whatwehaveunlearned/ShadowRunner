@@ -49,6 +49,8 @@ public class LocationActivity extends Activity implements LocationListener {
 	List<Double> testdistance = new ArrayList<Double>();
 	List<Double> testspeed = new ArrayList<Double>();
 	
+	//Data base manager
+	DataBaseManager manager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,7 @@ public class LocationActivity extends Activity implements LocationListener {
 		//Load the test file get the distances and speeds
 		testrunstringbuilder = loadtest ("distance1");
 		testrunstring = testrunstringbuilder.toString().split(",");
+		System.out.println(testrunstring);
 		convert(testrunstring, testdistance);
 		testrunstringbuilder = loadtest ("speed1");
 		testrunstring = testrunstringbuilder.toString().split(",");
@@ -74,6 +77,10 @@ public class LocationActivity extends Activity implements LocationListener {
 		bundle = getIntent().getExtras();
 		//STORETEXT = bundle.getString("path_name") + ".txt";
 		file = new File(STORETEXT);
+		//Create the database if it does not exist if it does it just loads it
+		manager = new DataBaseManager(this);
+		//Insert user run to db
+		manager.insertDB("user", "CN_NAME", bundle.getString("path_name"));
 		//For painting using canvas
 		mDrawView = new DrawView(this);
 		setContentView(mDrawView);
@@ -133,10 +140,11 @@ public class LocationActivity extends Activity implements LocationListener {
 		mTvLocation.setText(mLocation.getLatitude() + " ," + mLocation.getLongitude());
 		System.out.println("count value = " +count);
 		path.addLocation(location);
-		//We set to be -1 when the race is ended
+		//We set to be -1 when the race is ended save the path to the data base
 		if(exit == true){
-			endGPS();
-			finish();
+			//manager.insertDB(path, columnName, text);
+			this.endGPS();
+			this.finish();
 		}
 		//Only one location has no distance! so we wait to calculate when we have at least 2
 		if (count>=1){
