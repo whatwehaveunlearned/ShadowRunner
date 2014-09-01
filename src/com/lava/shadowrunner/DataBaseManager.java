@@ -3,6 +3,7 @@ package com.lava.shadowrunner;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 public class DataBaseManager {
@@ -19,7 +20,7 @@ public class DataBaseManager {
 	public static final String CN_PATH="path";
 	//Define Columns names for "path" TABLE
 	public static final String CN_PATH_ID="_id";
-	public static final String CN_LOCATIONS="locations";
+	public static final String CN_ISBEST="isbest";
 	public static final String CN_DISTANCES="distances";
 	public static final String CN_TIMES="times";
 	public static final String CN_ACCELERATIONS="accelerations";
@@ -31,16 +32,16 @@ public class DataBaseManager {
 	
 	public static final String CREATE_USERPATH_TABLE = "create table " + TABLE_NAME2 +" ("
 			+ CN_USERPATH_ID + " integer primary key autoincrement,"
+			+ CN_ISBEST + " text not null,"
 			+ CN_USERPATH_NAME + " integer not null," 
-			+ CN_PATH + " integer not null"
-			+ " foreign key(CN_USERPATH_NAME) references user(CN_USER_ID) foreign key(PATH) references path(CN_PATH_ID);";
+			+ CN_PATH + " integer not null,"
+			+ "foreign key(" + CN_USERPATH_NAME + ") references user("+ CN_USER_ID +"),foreign key("+ CN_PATH + ") references path(" + CN_PATH_ID + "));";
 	
 	public static final String CREATE_PATH_TABLE = "create table " + TABLE_NAME3 +" ("
 			+ CN_PATH_ID + " integer primary key autoincrement,"
-			+ CN_LOCATIONS + " integer," 
-			+ CN_DISTANCES + " integer" 
-			+ CN_TIMES + " integer," 
-			+ CN_ACCELERATIONS + " integer;";
+			+ CN_DISTANCES + " real," 
+			+ CN_TIMES + " real," 
+			+ CN_ACCELERATIONS + " real);";
 	/************** END SQL Strings to create data bases********************************/
 	
 	
@@ -53,11 +54,9 @@ public class DataBaseManager {
 		helper = new DbHelper(context);
 		//This creates the dataBase if it doesn't exist or returns it if it does
 		db=helper.getWritableDatabase();
-		System.out.println("CREATE_USER_TABLE: " + CREATE_USER_TABLE);
-		System.out.println("CREATE_USERPATH_TABLE: " + CREATE_USERPATH_TABLE);
-		System.out.println("CREATE_PATH_TABLE: " + CREATE_PATH_TABLE);
 	}
 	
+	/************************** INSERT ****************************************/
 	//Method to Generate the Content Values
 	public ContentValues generateContentValues (String column, String text){
 		ContentValues values = new ContentValues();
@@ -68,5 +67,31 @@ public class DataBaseManager {
 	public void insertDB (String dbName, String columnName, String text){
 		db.insert(dbName, null, generateContentValues(columnName,text)); //returns -1 when there is a problem
 	}
+	/************************** END INSERT *************************************/
 	
+	/************************** READ ****************************************/
+	//Method to read from data Base All arguments can be null except table
+	public Cursor LoadCursor(String table, String selection, String[] selectionArgs,  String groupBy, String having, String orderBy, String limit){
+		String[] columns;
+		//We select the columns we want to read depending on the table
+		if (table==TABLE_NAME1){
+			columns = new String[]{CN_USER_ID,CN_USER_NAME};
+		}else if (table==TABLE_NAME2){
+			columns = new String[]{CN_USERPATH_ID,CN_USER_NAME,CN_PATH};
+		}else if (table==TABLE_NAME3){
+			columns = new String[]{CN_PATH_ID,CN_DISTANCES,CN_TIMES,CN_ACCELERATIONS};
+		}else{
+			System.out.println("Your Table does not exist;");
+			return null;
+		}
+		return db.query(table, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
+	}
+	/**************************END READ ****************************************/
+	
+	/************************** DELETE ****************************************/
+	public void deleteRecord (String record){
+		db.delete(TABLE_NAME1,CN_USER_NAME+"?",new String[]{record});
+	}
+	
+	/************************** END DELETE ****************************************/
 }

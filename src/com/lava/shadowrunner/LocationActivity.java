@@ -7,60 +7,87 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import com.google.android.glass.touchpad.GestureDetector;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.view.WindowManager;
 import android.widget.Toast;
 
-public class LocationActivity extends Activity implements LocationListener {
-	LocationManager mLocationManager;
-	Location mLocation;
-	TextView mTvLocation;
-	DrawView mDrawView;
+public class LocationActivity extends Activity implements LocationListener, SensorEventListener {
+	
+	//location declarations
+	private LocationManager mLocationManager;
+	//private Location mLocation;
+	private DrawView mDrawView;
 	Bundle bundle;
-	String name;
+	//Test name of the run used only for testing purposes
+	private String STORETEXT="default1.txt";
 
-	//wifi_moore_test.txt text for GPS test confused with the name (walking)
-	//gps_moore_test.txt text for GPS test (running) to make comparisons
-	private String STORETEXT="default.txt";
-
-	File file;
-	private Path path = new Path();
-	//Initialize count to see when we calculate the distance in onLocationChanged
-	int count;
-	int totaldistance;
+	//Initialize values for onLocationChanged
+	private int count;
+	private int totaldistance;
 	//Hold the values for the user and the competitor actual distance
-	Double userdistance;
-	Double competdistance;
+	private Double userdistance;
+	private Double competdistance;
 	//Set to true when the race is finished
-	boolean exit=false;
+	private boolean exit=false;
 	
 	//Load the test file for prototype
-	StringBuilder testrunstringbuilder;
-	String [] testrunstring;
-	List<Double> testdistance = new ArrayList<Double>();
-	List<Double> testspeed = new ArrayList<Double>();
+	private StringBuilder testrunstringbuilder;
+	private String [] testrunstring;
+	private List<Double> testdistance = new ArrayList<Double>();
+	private List<Double> testspeed = new ArrayList<Double>();
+	private File file;
+	private Path path = new Path();
 	
 	//Data base manager
-	DataBaseManager manager;
-
+	private DataBaseManager manager;
+	private Cursor cursor;
+	
+	//Sensor measurements
+	private SensorManager mSensorManager;
+	private Sensor mSensorAccelerometer;
+	private Sensor mSensorGravity;
+	private Sensor mSensorGyroscope;
+	private Sensor mSensorLight;
+	private Sensor mSensorLinearAcceleration;
+	private Sensor mSensorMagneticField;
+	private Sensor mSensorRotationVector;
+	private Date mSensorDataUpdatedTime;
+	float[] mAccelerometer;
+	float[] mGravity;
+	float[] mGyroscope;
+	float[] mLight;
+	float[] mLinearAcceleration;
+	float[] mMagneticField;
+	float[] mRotationVector;
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		//The next line is needed in order to keep the screen on all the time
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		//Initialize variables that will be updated in onChangedLocation
 		count = 0;
 		totaldistance = 0;
 		userdistance = 0.0;
 		competdistance = 0.0;
-		setContentView(R.layout.location);
-		mTvLocation = (TextView) findViewById(R.id.tvLocation);
 		mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		//Load the test file get the distances and speeds
 		testrunstringbuilder = loadtest ("distance1");
@@ -72,7 +99,6 @@ public class LocationActivity extends Activity implements LocationListener {
 		convert(testrunstring, testspeed);
 		//Calculate total distance for the competitor run for drawing based in a scale
 		totaldistance+=testdistance.get(testrunstring.length-1);
-		System.out.println("TOTALDISTANCE: " + totaldistance);
 		//Retrieve the name of the run passed from MenuActivity
 		bundle = getIntent().getExtras();
 		//STORETEXT = bundle.getString("path_name") + ".txt";
@@ -80,11 +106,23 @@ public class LocationActivity extends Activity implements LocationListener {
 		//Create the database if it does not exist if it does it just loads it
 		manager = new DataBaseManager(this);
 		//Insert user run to db
-		manager.insertDB("user", "CN_NAME", bundle.getString("path_name"));
+		manager.insertDB("user", DataBaseManager.CN_USER_NAME, "test");
+		cursor = manager.LoadCursor("user", null, null, null, null, null, null);
+		System.out.println("Cursor: " + cursor);
 		//For painting using canvas
 		mDrawView = new DrawView(this);
 		setContentView(mDrawView);
 		mDrawView.requestFocus();
+		//Sensor assignment declarations
+		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		mSensorGravity = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+		mSensorGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+		mSensorLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+		mSensorLinearAcceleration = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+		mSensorMagneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+		mSensorRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+		mSensorDataUpdatedTime = new Date();
 		
 		
 	}
@@ -105,28 +143,34 @@ public class LocationActivity extends Activity implements LocationListener {
 			allString += p+":";
 			if (mLocationManager.isProviderEnabled(p)){
 				allString += "Y;";
-				mLocationManager.requestLocationUpdates(p,100*60,0,this); //100*60
+				mLocationManager.requestLocationUpdates(p,100*60,0,this);
 				Location location = mLocationManager.getLastKnownLocation(p);
 				if(location==null)
 					System.out.println("getLastKnownLocation for provider " + p + " returns null");
 				else{
 					System.out.println("getLastKnownLocation for provider " + p + "returns NOT null");
-					mTvLocation.setText(location.getLatitude() + "," + location.getLongitude());
 				}
 			}
 			else allString += "N;";
 			//on Glass, allString is : remote_gps:Y;remote_network:Y;network:Y;passive:Y
-			mTvLocation.setText(allString);
 		}
+		mSensorManager.registerListener(this, mSensorAccelerometer,SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(this, mSensorGravity,SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(this, mSensorGyroscope,SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(this, mSensorLight,SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(this, mSensorLinearAcceleration,SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(this, mSensorMagneticField,SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(this, mSensorRotationVector,SensorManager.SENSOR_DELAY_NORMAL);
 	}
 	
-
 	@Override
 	protected void onDestroy() {
+		mSensorManager.unregisterListener(this);
 		endGPS();
 		super.onDestroy();
 	}
 
+	//********************************************************* LOCATION METHODS **************************************************************************
 	@Override
 	public void onLocationChanged(Location location) {
 		//Our zero in the line is 50
@@ -134,16 +178,14 @@ public class LocationActivity extends Activity implements LocationListener {
 		int competitorpos=50;
 		Double diference= 0.0;
 		String output = "";
-		mLocation = location;
 		double competspeed=0.0;
 		
-		mTvLocation.setText(mLocation.getLatitude() + " ," + mLocation.getLongitude());
-		System.out.println("count value = " +count);
 		path.addLocation(location);
 		//We set to be -1 when the race is ended save the path to the data base
 		if(exit == true){
 			//manager.insertDB(path, columnName, text);
 			this.endGPS();
+			mSensorManager.unregisterListener(this);
 			this.finish();
 		}
 		//Only one location has no distance! so we wait to calculate when we have at least 2
@@ -284,4 +326,54 @@ public class LocationActivity extends Activity implements LocationListener {
 		}
 		
 		//****************** END Methods used for drawing in the canvas *********************
+		
+		//********************************************************* END LOCATION METHODS **************************************************************************
+		
+		//********************************************************* SENSOR METHODS **************************************************************************
+		@Override
+		public void onSensorChanged(SensorEvent event) {
+			if(event.sensor.getType()==Sensor.TYPE_ACCELEROMETER && new Date().getTime() - mSensorDataUpdatedTime.getTime() > 1000){
+					mAccelerometer = event.values.clone();
+					System.out.println("mAccelerometer: " + display(mAccelerometer));
+					mSensorDataUpdatedTime = new Date();
+			}
+			if(event.sensor.getType()==Sensor.TYPE_GRAVITY && new Date().getTime() - mSensorDataUpdatedTime.getTime() > 1000){
+				mGravity = event.values.clone();
+				System.out.println("mGravity: " + display(mGravity));
+				mSensorDataUpdatedTime = new Date();
+			}
+			if(event.sensor.getType()==Sensor.TYPE_GYROSCOPE && new Date().getTime() - mSensorDataUpdatedTime.getTime() > 1000){
+				mGyroscope = event.values.clone();
+				System.out.println("mGyroscope: " + display(mGyroscope));
+				mSensorDataUpdatedTime = new Date();
+			}
+			if(event.sensor.getType()==Sensor.TYPE_LIGHT && new Date().getTime() - mSensorDataUpdatedTime.getTime() > 1000){
+				mLight = event.values.clone();
+				System.out.println("mLight: " + mLight[0]);
+				mSensorDataUpdatedTime = new Date();
+			}
+			if(event.sensor.getType()==Sensor.TYPE_LINEAR_ACCELERATION && new Date().getTime() - mSensorDataUpdatedTime.getTime() > 1000){
+				mLinearAcceleration = event.values.clone();
+				System.out.println("mLinearAcceleration: " + display(mLinearAcceleration));
+				mSensorDataUpdatedTime = new Date();
+			}if(event.sensor.getType()==Sensor.TYPE_ROTATION_VECTOR && new Date().getTime() - mSensorDataUpdatedTime.getTime() > 1000){
+				mRotationVector = event.values.clone();
+				System.out.println("mRotationVector: " + display(mRotationVector));
+				mSensorDataUpdatedTime = new Date();
+			}
+			
+		}
+
+		@Override
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {
+			// TODO Auto-generated method stub
+			
+		}
+		//This method is created because the sensor send back information typically on three axis
+		String display(float[] values){
+			return "\n" + values[0] + "\n" + values[1] + "\n" + values[2] + "\n"; 
+		}
+		//********************************************************* END SENSOR METHODS **************************************************************************
+
+		
 }

@@ -21,8 +21,13 @@ public class DbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		
-		db.execSQL(DataBaseManager.CREATE_TABLE1);
-		db.execSQL(DataBaseManager.CREATE_TABLE2);
+		System.out.println("CREATE_USER_TABLE: " + DataBaseManager.CREATE_USER_TABLE);
+		System.out.println("CREATE_USERPATH_TABLE: " + DataBaseManager.CREATE_USERPATH_TABLE);
+		System.out.println("CREATE_PATH_TABLE: " + DataBaseManager.CREATE_PATH_TABLE);
+		
+		db.execSQL(DataBaseManager.CREATE_USER_TABLE);
+		db.execSQL(DataBaseManager.CREATE_PATH_TABLE);
+		db.execSQL(DataBaseManager.CREATE_USERPATH_TABLE);
 		
 	}
 	
